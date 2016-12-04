@@ -1,6 +1,6 @@
 var express = require('express');
 // 加密
-var crypto =require('crypto')
+var crypto =require('crypto');
 
 
 
@@ -62,11 +62,13 @@ module.exports = function (app) {
     }
     res.render('post',{msg:req.session.msg});
   });
+
+  app.post('/signup', users.signup);
+  app.post('/user/update', users.updateUser);
+  app.post('/user/delete', users.deleteUser);
+  app.post('/login', users.login);
+  app.get('/user/profile', users.getUserProfile);
+
 };
 
 
-app.post('/signup', users.signup);
-app.post('/user/update', users.updateUser);
-app.post('/user/delete', users.deleteUser);
-app.post('/login', users.login);
-app.get('/user/profile', users.getUserProfile);

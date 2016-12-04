@@ -11,12 +11,12 @@
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
-var logger = require('morgan');
+// var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
-var index = require('./routes/index');
-var users = require('./routes/users');
+// var index = require('./routes/index');
+// var users = require('./routes/users');
 
 var app = express();
 // session
@@ -35,36 +35,42 @@ var app = express();
 var expressSession = require('express-session');
 var mongoStore = require('connect-mongo')({session:expressSession});
 require('./models/users_model');
-var conn = mongoose.connect('mongodb://localhost/myapp');
+var conn =mongoose.connect('mongodb://localhost/myapp');
+
+
+// 设置 Web server
+
+// view engine setup
+app.engine('.html',require('ejs').__express);
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'html');
+
+//中间件设置
+
+// app.use(bodyParser());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+
+
+
+// 将路由管理交由routes文件夹下的index.js 管理
+
+
 
 app.use(expressSession({
 //    cookie: {maxAge: 80000 },  //设置maxAge是80000ms，即80s后session和相应的cookie失效过期
   secret: 'SECRET',
   cookie: {maxAge:60*60*1000},
   // store 就是将session 存储到数据库中去
-  store: new  mongoStore({
-    db: mongoose.connection.db, //数据库的名称
+  resave:false,//添加这行
+  saveUninitialized: true,//添加这行
+    store: new  mongoStore({
+      mongooseConnection: conn.connection,
+    // db: mongoose.connection.db, //数据库的名称
     collection: 'sessions'
   })
 }));
-// 设置 Web server
-
-
-
-
-// view engine setup
-app.engine('.html/',require('ejs').__express);
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'html');
-
-//中间件设置
-
-app.use(bodyParser());
-app.use(cookieParser());
-
-
-// 将路由管理交由routes文件夹下的index.js 管理
 require('./routes')(app);
-
 // 监听80 端口
-app.listen(80);
+app.listen(3030);
