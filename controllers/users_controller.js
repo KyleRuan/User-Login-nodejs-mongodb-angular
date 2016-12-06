@@ -48,7 +48,7 @@ exports.login = function (req,res) {
   User.findOne({username:req.body.username}).exec(function (err,user) {
     if (!user) {
       err = 'User Not Find';
-    } else if (user.password === hashPW(req.body.password)) {
+    } else if (user.hashed_password === hashPW(req.body.password)) {
       // 如果密码正确
       //session提供了regenerate方法，用来将整个session清空，然后可以重新赋值。
         req.session.regenerate(function () {
@@ -112,8 +112,6 @@ exports.updateUser = function(req, res){
   User.findOne({_id:req.session.user}).exec(function (err,user) {
     if (user) {
       user.set('email',req.body.email);
-      user.set('username',req.body.username);
-      user.set('hash_password');
       user.set('color',req.body.color);
       user.save(function (err) {
         if (err) {
@@ -121,21 +119,21 @@ exports.updateUser = function(req, res){
         } else {
           req.session.msg = 'User Updated.';
         }
-        res.redirect('/user');
+        res.redirect('/');
       });
     }
   });
 };
 
 exports.deleteUser = function(req, res){
-  User.findOne({ _id: req.session.user }).exec(function (err,user) {
+  User.findOne({ _id: req.session.user })
+      .exec(function (err,user) {
     if (user) {
-      // 找到
       user.remove(function (err) {
         if (err){
           req.session.msg = err;
         }
-        req.session.destroy(function(){
+          req.session.destroy(function(){
           res.redirect('/login');
         });
       });
