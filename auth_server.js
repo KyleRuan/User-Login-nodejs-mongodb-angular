@@ -21,10 +21,9 @@ var mongoStore = require('connect-mongo')({session:expressSession});
 require('./models/users_model');
 var conn =mongoose.connect('mongodb://localhost/myapp');
 mongoose.Promise = require('bluebird');
-
-
+// set template engine
 app.engine('.html',require('ejs').__express);
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'app/views'));
 app.set('view engine', 'html');
 
 //中间件设置
@@ -34,23 +33,12 @@ app.set('view engine', 'html');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
+//将前端和后端分开开发,前端就直接会定位到当前文件夹为静态资源库
+app.use(express.static(path.join(__dirname)));
 
-
-
-// 将路由管理交由routes文件夹下的index.js 管理
-
-
-/*
- 强制将“未初始化”的会话保存到商店。 会话在为新的但未修改时未初始化。
- 选择false可用于在设置Cookie之前实施登录会话，减少服务器存储空间使用情况或遵守需要权限的法律。
- 选择false还将有助于客户端在没有会话的情况下发出多个并行请求的竞争条件。
- 默认值为true，但使用默认值已弃用，因为默认值将在以后更改。 请研究此设置，并选择适合您的使用情况。
- */
 app.use(expressSession({
-//    cookie: {maxAge: 80000 },  //设置maxAge是80000ms，即80s后session和相应的cookie失效过期
   secret: 'SECRET',
   cookie: {maxAge:60*60*1000},
-  // store 就是将session 存储到数据库中去
   resave:false,
   saveUninitialized: true,
     store: new  mongoStore({
@@ -58,5 +46,5 @@ app.use(expressSession({
     collection: 'sessions'
   })
 }));
-require('./routes')(app);
+require('./routes/routes')(app);
 app.listen(3030);

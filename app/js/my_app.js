@@ -6,7 +6,6 @@
  * 提供 Angular模块和控制器的定义
  */
 
-
 angular.module('myApp', []).
 controller('myController', ['$scope', '$http',
   function($scope, $http) {

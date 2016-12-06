@@ -1,11 +1,9 @@
 var crypto = require('crypto');
 var express = require('express');
 module.exports = function(app) {
-  var users = require('./controllers/users_controller');
-  //获取静态文件,
-  app.use('/static', express.static( './static')).
-  use('/lib', express.static( '../lib')
-  );
+  var users = require('./../controllers/users_controller');
+  //获取静态文件,这样就有可以通过 localhost:3030/static/app/js/my_app.js来获取静态资源了
+  app.use('/static', express.static( __dirname+'/app'));
   app.get('/', function(req, res){
     if (req.session.user) {
       res.render('index', {username: req.session.username,
